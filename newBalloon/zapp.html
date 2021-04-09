@@ -62,12 +62,14 @@ https://zimjs.com/zapps
 // "tagID"    add canvas to HTML tag of ID - set to dimensions if provided - no scaling
 
 const scaling = "full"; // this will resize to fit inside the screen dimensions
-const width = 1024;
-const height = 768;
+let width = 1920;
+const height = 1080;
 const color = light; // ZIM colors like green, blue, pink, faint, clear, etc.
 const outerColor = dark; // any HTML colors like "violet", "#333", etc. are fine to use
 var path = "assets/";
-var assets = ["ball1.png", "ball2.png", "ball3.png", "ball4.png", "ball5.png", "ball6.png", "balloon-background.png","game-background.png", "fireworks.wav", "Balloons.ttf"];
+
+
+var assets = ["ball1.png", "ball2.png", "ball3.png", "ball4.png", "ball5.png", "ball6.png", "background.png","game-background.png", "fireworks.wav", "logo.png",{font:"balloonFont", src:"Balloons.ttf"}];
 const frame = new Frame(scaling, width, height, color, outerColor,assets, path);
 frame.on("ready", () => { // ES6 Arrow Function - like function(){}
     zog("ready from ZIM Frame");
@@ -77,14 +79,38 @@ frame.on("ready", () => { // ES6 Arrow Function - like function(){}
 	// Message shows if only if running from mobile Browser
 	// See https://zimjs.com/docs.html?item=PWA for more options
 
-	new PWA(runZapp);
-	function runZapp() {
-	
-	    const stage = frame.stage;
+
+		let stage = frame.stage;
 	    let stageW = frame.width;
 	    let stageH = frame.height;
-	
-	
+		const background=asset("game-background.png").centerReg().sca(1.4);
+		let page1 = new Container(stageW, stageH).addTo();
+		let content = new Container(800, 800).centerReg(page1);
+		// let header =new Container(300, 100).addTo(page1).outline();
+		let layout = new Layout({
+        holder:page1,
+        regions:[
+			
+            {object:content, marginTop:5, maxWidth:90}
+            
+        ],
+        lastMargin:2,
+       
+        scalingObject:stage
+    	});
+
+		frame.on("resize", function () {
+			layout.resize();
+			 
+		});
+	new PWA(runZapp);
+	function runZapp() {
+		
+
+	   
+
+		
+		
 	    
 	    let socketStart = new Socket(zimSocketURL, "balloon-pop", "waiting-room", 6);
 	
@@ -101,19 +127,30 @@ frame.on("ready", () => { // ES6 Arrow Function - like function(){}
 	            console.log("I am in the wait room");
 	            // const font=asset("Balloons.ttf")
 	            // const logo=new Label({font:font,size:50, color:green, rollColor:purple, shadowColor:"black", valign:center, align:center}).centerReg(container).loc(null, 300);
-	            const background=asset("balloon-background.png").centerReg().sca(1.35)
 	            
-	            const container=new Container(stageW,stageH).center();
+				const logo=asset("logo.png")
+			    const backing=new Rectangle(900,300, grey).centerReg(content).loc(null,320)
+				const welcome=new Label ({font:"balloonFont", text:"Welcome to the Balloon POP! Party !", size:65, color:blue}).centerReg(content).loc(null,225);
 	            
-	            const enter=new Button({width:500,height:50,label:"Waiting for friends to arrive!", backgroundColor:orange,rollBackgroundColor:grey, }).centerReg(container);
+	            const container=new Container(stageW,stageH).center(); 
 	            
-	            const instruction=new Label({text:"You're invited to the balloon POP! party. \n\n Pop other people's balloons by clicking on them!\n\n You need at least 3 people to throw a party!", color:purple, valign:"center", align:"center", bold:true}).centerReg(container).loc(null,450);
+	        	// const enter=new Button({width:500,height:50,label:"Waiting for friends to arrive !", backgroundColor:orange,rollBackgroundColor:grey, }).centerReg(content).loc(null,630);
+	            const enter=new Label({font:"balloonFont", text:"Waiting for friends to arrive!", color:white,align:"center" }).centerReg(content).loc(null,400);
+	            
+	            const instruction=new Label({font:"balloonFont",text:"Pop other people's balloons by clicking on them !\n\n You need at least 3 people to throw a party !", color:blue, valign:"center", align:"center", bold:true}).centerReg(content).loc(null,320);
 	          
-	            const number=new Label({color:grey, valign:"center", align:"center"}).centerReg(container).loc(null,600);
+	            const number=new Label({font:"balloonFont", color:white, valign:"center", align:"center", }).centerReg(content).loc(null,440);
 	            
 	            function setBtn(){
 	                if (socketStart.size+1>=3){
 	                enter.text="Let's start the party!";
+					logo.centerReg(content)
+						.sca(0.5).loc(null, 600)
+						.animate({							
+						props:{y:630},
+						loop:true,
+						rewind:true
+					});
 	                stage.update(); 
 	                }
 	               
@@ -142,9 +179,9 @@ frame.on("ready", () => { // ES6 Arrow Function - like function(){}
 	
 	            setNum();
 	            
-	            container.on("click", ()=> {
+	            logo.on("click", ()=> {
 	                
-	                const startElements=[enter,instruction,number]; 
+	                const startElements=[enter,instruction,number,welcome,logo,backing]; 
 	
 	                for(let i=0; i<startElements.length; i++){
 	                    startElements[i].animate({
@@ -181,7 +218,7 @@ frame.on("ready", () => { // ES6 Arrow Function - like function(){}
 	                   
 	        
 	            
-	        
+				
 	        }
 	    
 	    
@@ -190,10 +227,10 @@ frame.on("ready", () => { // ES6 Arrow Function - like function(){}
 	
 	           
 	
-	            const retry=new Button({width:850,height:100,label:"You need at least 3 friends to start the game!", backgroundColor:red,rollBackgroundColor:grey}).center().tap(() => {
+	            const retry=new Button({width:850,height:100,label:"You need at least 3 friends to start the game!", backgroundColor:red,rollBackgroundColor:grey}).centerReg(content).tap(() => {
 	               retry.removeFrom();
 	               waitRoom();
-	                const background=asset("balloon-background.png").centerReg().sca(1.35)
+	                
 	                
 	            });
 	
@@ -210,7 +247,7 @@ frame.on("ready", () => { // ES6 Arrow Function - like function(){}
 	            zogg("Game socket is ready");
 	
 	            // load all the assets including background and balloons 
-	            const backgroundGame=asset("game-background.png").centerReg().sca(1.4)
+	         
 	           
 	            const ball1=asset("ball1.png");
 	            const ball2=asset("ball2.png");
@@ -219,6 +256,9 @@ frame.on("ready", () => { // ES6 Arrow Function - like function(){}
 	            const ball5=asset("ball5.png");
 	            const ball6=asset("ball6.png");
 	            const balloons=[ball1,ball2,ball3,ball4,ball5,ball6];
+				for(let i=0; i<balloons.length; i++){
+					balloons[i].sca(0.7);
+				}
 	
 	        
 	            const avatars = {};      
@@ -293,7 +333,7 @@ frame.on("ready", () => { // ES6 Arrow Function - like function(){}
 	                        
 	                        //show lose pane on your own screen
 	                        timeout(1, function(){
-	                            new Pane(500,100, "Your balloon got POPPED!", red,white).noMouse().show(); 
+	                            new Pane(500,100, "Your balloon got POPPED!", red,white).noMouse().addTo(content).show(); 
 	                        }); 
 	                    
 	                    
