@@ -129,15 +129,15 @@ frame.on("ready", () => { // ES6 Arrow Function - like function(){}
 	            // const logo=new Label({font:font,size:50, color:green, rollColor:purple, shadowColor:"black", valign:center, align:center}).centerReg(container).loc(null, 300);
 	            
 				const logo=asset("logo.png")
-			    const backing=new Rectangle(900,300, grey).centerReg(content).loc(null,320)
-				const welcome=new Label ({font:"balloonFont", text:"Welcome to the Balloon POP! Party !", size:65, color:blue}).centerReg(content).loc(null,225);
+			    const backing=new Rectangle({width:900,height:300, color:"tan", corner:10,borderWidth:8, borderColor:"MediumVioletRed "}).centerReg(content).loc(null,320)
+				const welcome=new Label ({font:"balloonFont", text:"Welcome to the Balloon POP! Party !", size:65, color:"MediumVioletRed "}).centerReg(content).loc(null,225);
 	            
 	            const container=new Container(stageW,stageH).center(); 
 	            
 	        	// const enter=new Button({width:500,height:50,label:"Waiting for friends to arrive !", backgroundColor:orange,rollBackgroundColor:grey, }).centerReg(content).loc(null,630);
 	            const enter=new Label({font:"balloonFont", text:"Waiting for friends to arrive!", color:white,align:"center" }).centerReg(content).loc(null,400);
 	            
-	            const instruction=new Label({font:"balloonFont",text:"Pop other people's balloons by clicking on them !\n\n You need at least 3 people to throw a party !", color:blue, valign:"center", align:"center", bold:true}).centerReg(content).loc(null,320);
+	            const instruction=new Label({font:"balloonFont",text:"Pop other people's balloons by clicking on them !\n\n You need at least 3 people to throw a party !", color:"rebeccapurple ", valign:"center", align:"center", bold:true}).centerReg(content).loc(null,320);
 	          
 	            const number=new Label({font:"balloonFont", color:white, valign:"center", align:"center", }).centerReg(content).loc(null,440);
 	            
