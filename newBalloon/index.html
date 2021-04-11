@@ -270,12 +270,19 @@ frame.on("ready", () => { // ES6 Arrow Function - like function(){}
 	                // add avatar       
 	              
 	                    avatars[id]=balloons[count].center();//error on this line "ZIM DispatchEvent() error: data TypeError: Cannot read property 'center' of undefined"
-	
-	                
-	               
-	                
+	                    addEvent(id);                
 	            });
 	            
+				// this function gets called above for existing balloons 
+            // and below in the data event for new balloons coming in
+				function addEvent(id){
+					avatars[id].on("click",()=>{
+						socket.setProperty("removed",id); 
+						avatars[id].dispose(); 
+						delete avatars[id]; 
+						stage.update();
+					});
+				}
 	            
 	        
 	            const ball = balloons[socket.size].addTo();
@@ -311,16 +318,12 @@ frame.on("ready", () => { // ES6 Arrow Function - like function(){}
 	                            obj:{
 	                            type:"shape", s:[frame.blue, frame.green, frame.pink, frame.yellow, frame.orange], ss:5
 	                            },
-	
-	                            
-	                            random:{color:[blue, green, pink, yellow, orange]},
-	                            interval:1, // default
+								random:{color:[blue, green, pink, yellow, orange]},
+	                            interval:1, 
 	                            life:2,
-	                            decayTime:.5, // default
-	                            num:3,
-	                        
-	                        
-	                            cache:false, // default
+	                            decayTime:.5, 
+	                            num:3,                       
+	                            cache:false
 	                        }).loc(ball.x, ball.y); 
 	
 	                        //dispose the ball on your own screen
@@ -352,21 +355,22 @@ frame.on("ready", () => { // ES6 Arrow Function - like function(){}
 	                    if (data.x != null) avatars[data.id].x = data.x;
 	                    if (data.y != null) avatars[data.id].y = data.y;
 	                    if (data.level != null) avatars[data.id].level = 1;
-	                    avatars[data.id].on("click", ()=>{
-	                        // set the removed property on the clicked ball
-	                        socket.setProperty("removed", data.id); 
+	                    // avatars[data.id].on("click", ()=>{
+	                    //     // set the removed property on the clicked ball
+	                    //     socket.setProperty("removed", data.id); 
 	
-	                        // dispose of the ball
-	                        avatars[data.id].dispose();
+	                    //     // dispose of the ball
+	                    //     avatars[data.id].dispose();
 	                                             
-	                         // removes and clears from memory
-	                        delete avatars[data.id];  
-	                        stage.update(); 
-	                    })
+	                    //      // removes and clears from memory
+	                    //     delete avatars[data.id];  
+	                    //     stage.update(); 
+	                    // })
 	
 	                } else { // we are new and we want to add avatar
 	                    // add avatar
 	                    avatars[data.id] = balloons[data.count].center(); 
+						addEvent(data.id);
 	                }
 	            
 	                stage.update();
