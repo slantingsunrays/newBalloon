@@ -359,8 +359,7 @@ https://zimjs.com/zapps
                 // ********************
                 // no need to loop through data it will always be sent from one socket
                 // loop through data and remove any sockets that have their socket id=removed
-                // loop(data, function(i){
-
+                // loop(data, function (i) {
                 // ********************
                 // ignore any removed balloon data
                 // as it may not yet know it is removed
@@ -391,16 +390,28 @@ https://zimjs.com/zapps
                         ss: 5,
                       },
                       random: { color: [blue, green, pink, yellow, orange] },
-                      interval: 1, // default
+                      interval: 1,
                       life: 2,
-                      decayTime: 0.5, // default
+                      decayTime: 0.5,
                       num: 3,
-                      cache: false, // default
+                      cache: false,
                     }).loc(balloon.x, balloon.y);
 
                     //dispose the balloon on your own screen
                     balloon.dispose();
                     balloon = null; // remove reference to balloon
+
+                    for (let id in avatars) {
+                      avatars[id].noMouse();
+                    }
+
+                    // loop(data, (id) => {
+                    //   // add avatar
+                    //   console.log("hallo");
+                    //   console.log(id);
+                    //   //   avatars[id].noMouse();
+                    // });
+                    //console.log(data.id);
 
                     //play fireworks sound
                     // const fireworks=asset("fireworks.wav").play()
