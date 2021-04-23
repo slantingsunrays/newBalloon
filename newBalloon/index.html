@@ -132,8 +132,6 @@ https://zimjs.com/zapps
             // ~~~~~~~~~~~~~~~~~~~~~~~loads a waiting room for everyone ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
             function waitRoom() {
               console.log("I am in the wait room");
-              // const font=asset("Balloons.ttf")
-              // const logo=new Label({font:font,size:50, color:green, rollColor:purple, shadowColor:"black", valign:center, align:center}).centerReg(container).loc(null, 300);
 
               const logo = asset("logo.png");
               const backing = new Rectangle({
@@ -157,7 +155,6 @@ https://zimjs.com/zapps
 
               const container = new Container(stageW, stageH).center();
 
-              // const enter=new Button({width:500,height:50,label:"Waiting for friends to arrive !", backgroundColor:orange,rollBackgroundColor:grey, }).centerReg(content).loc(null,630);
               const enter = new Label({
                 font: "balloonFont",
                 text: "Waiting for friends to arrive!",
@@ -187,7 +184,7 @@ https://zimjs.com/zapps
               })
                 .centerReg(content)
                 .loc(null, 440);
-
+              //adds if the socket size is bigger than 3, start the game
               function setBtn() {
                 if (socketStart.size + 1 >= 3) {
                   enter.text = "Let's start the party!";
@@ -203,14 +200,14 @@ https://zimjs.com/zapps
                   stage.update();
                 }
               }
-
+              //if the socket size is smaller than 3, keep everyone in the waiting room 
               function leaveBtn() {
                 if (socketStart.size < 3) {
                   enter.text = "Waiting for friends to arrive!";
                   stage.update();
                 }
               }
-
+              // set the humber of the socket to the people in the room 
               function setNum() {
                 number.text =
                   "There are currently " +
@@ -218,7 +215,7 @@ https://zimjs.com/zapps
                   " friends in the room";
                 stage.update();
               }
-
+              // when a person leaves the room, minus that number 
               function minusNumber() {
                 number.text =
                   "There are currently " +
@@ -230,7 +227,7 @@ https://zimjs.com/zapps
               setBtn();
 
               setNum();
-
+              // logo appears when enough people are in the room and allows them to enter 
               logo.on("click", () => {
                 const startElements = [
                   enter,
@@ -247,7 +244,7 @@ https://zimjs.com/zapps
                     time: 0.5,
                   });
                 }
-
+                // if room has 3 people, enter the room. otherwise retry 
                 if (socketStart.size + 1 >= 3) {
                   startGame();
                 } else {
@@ -265,7 +262,7 @@ https://zimjs.com/zapps
                 leaveBtn(); // adjust our button text when someone arrives
               });
             }
-
+            //show up when there are less than 3 people in the room 
             function retry() {
               const retry = new Button({
                 width: 850,
@@ -310,9 +307,9 @@ https://zimjs.com/zapps
               const avatars = {};
               const removedIDs = [];
 
-              // add existing avatars
+              // add existing balloons
               loop(data, (id, props, count) => {
-                // add avatar
+                // add balloon
 
                 avatars[id] = balloons[count].center(); //error on this line "ZIM DispatchEvent() error: data TypeError: Cannot read property 'center' of undefined"
                 addEvent(id);
@@ -364,6 +361,7 @@ https://zimjs.com/zapps
                 // ignore any removed balloon data
                 // as it may not yet know it is removed
                 // and would try and add itself back as a new balloon
+                //*********************
                 if (removedIDs.indexOf(data.id) >= 0) return;
 
                 if (data.removed != null && data.removed == socket.id) {
@@ -375,6 +373,7 @@ https://zimjs.com/zapps
                   // so if it is the first call the balloon will still be there - then we delete the balloon and set it to null
                   // so for the second call, there will be no balloon and the second call will be ignored.
                   // this will prevent the dispose() on undefined error.
+                  // ********************
                   if (balloon) {
                     //create a new emitter at the location of the balloon
                     new zim.Emitter({
