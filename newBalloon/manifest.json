@@ -1,12 +1,12 @@
 {
-  "name": "Balloon",
-  "short_name": "Balloon",
+  "name": "balloon-pop",
+  "short_name": "balloon-pop",
   "lang": "en-US",
-  "start_url": "./Balloons.html",
+  "start_url": "./index.html",
   "display": "standalone",
   "background_color": "#333333",
   "theme_color": "#333333",
-  "orientation": "landscape",
+  "orientation": "portrait",
   "icons": [
     {"src": "icons/icon_128.png", "sizes": "128x128", "type": "image/png"},
     {"src": "icons/icon_144.png", "sizes": "144x144", "type": "image/png"},

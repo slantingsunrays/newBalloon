@@ -16,11 +16,47 @@ https://zimjs.com/zapps
     <link rel="manifest" href="manifest.json" />
 
     <!-- ZIM PWA STEP 2 - META -->
-    <meta name="apple-mobile-web-app-title" content="Balloon" />
+    <meta name="apple-mobile-web-app-title" content="balloon-pop" />
     <meta name="theme-color" content="#333333" />
     <meta name="msapplication-TileColor" content="#333333" />
 
     <meta name="viewport" content="width=device-width, user-scalable=no" />
+    <link rel="apple-touch-icon" href="icons/icon_152.png" />
+    <meta name="apple-mobile-web-app-capable" content="yes" />
+    <meta name="apple-mobile-web-app-status-bar-style" content="black" />
+    <meta name="msapplication-TileImage" content="icons/icon_144.png" />
+
+    <!-- should have faveicons - see link below -->
+    <!-- see https://www.favicon-generator.org/ -->
+
+    <meta name="mobile-web-app-capable" content="yes" />
+    <meta name="apple-mobile-web-app-capable" content="yes" />
+    <meta name="msapplication-starturl" content="./" />
+
+    <!-- ZIM PWA STEP 3 - SERVICE WORKER -->
+    <script>
+      window.addEventListener("DOMContentLoaded", function () {
+        if (location.protocol === "https:" && "serviceWorker" in navigator)
+          navigator.serviceWorker.register("./serviceworker.js");
+      });
+    </script>
+
+    <!--
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+ZIM Zapps
+Progressive Web App (PWA) tool output from
+https://zimjs.com/zapps 
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+-->
+
+    <!-- ZIM PWA STEP 1 - MANIFEST -->
+    <link rel="manifest" href="manifest.json" />
+
+    <!-- ZIM PWA STEP 2 - META -->
+    <meta name="apple-mobile-web-app-title" content="Balloon" />
+    <meta name="theme-color" content="#333333" />
+    <meta name="msapplication-TileColor" content="#333333" />
+
     <link rel="apple-touch-icon" href="icons/icon_152.png" />
     <meta name="apple-mobile-web-app-capable" content="yes" />
     <meta name="apple-mobile-web-app-status-bar-style" content="black" />
@@ -97,387 +133,402 @@ https://zimjs.com/zapps
         // Message shows if only if running from mobile Browser
         // See https://zimjs.com/docs.html?item=PWA for more options
 
-        let stage = frame.stage;
-        let stageW = frame.width;
-        let stageH = frame.height;
-        const background = asset("game-background.png").centerReg().sca(1.4);
-        let page1 = new Container(stageW, stageH).addTo();
-        let content = new Container(800, 800).centerReg(page1);
-        // let header =new Container(300, 100).addTo(page1).outline();
-        let layout = new Layout({
-          holder: page1,
-          regions: [{ object: content, marginTop: 5, maxWidth: 90 }],
-          lastMargin: 2,
-
-          scalingObject: stage,
-        });
-
-        frame.on("resize", function () {
-          layout.resize();
-        });
         new PWA(runZapp);
         function runZapp() {
-          let socketStart = new Socket(
-            zimSocketURL,
-            "balloon-pop",
-            "waiting-room",
-            6
-          );
+          // ZIM PWA STEP 4 - ADD TO HOME SCREEN (A2HS)
+          // NOTE: new PWA() works with ZIM Cat 04 or beyond
+          // Message shows if only if running from mobile Browser
+          // See https://zimjs.com/docs.html?item=PWA for more options
 
-          socketStart.on("ready", () => {
-            console.log("I'm in socketStart");
+          let stage = frame.stage;
+          let stageW = frame.width;
+          let stageH = frame.height;
+          const background = asset("game-background.png").centerReg().sca(1.4);
+          let page1 = new Container(stageW, stageH).addTo();
+          let content = new Container(800, 800).centerReg(page1);
+          // let header =new Container(300, 100).addTo(page1).outline();
+          let layout = new Layout({
+            holder: page1,
+            regions: [{ object: content, marginTop: 5, maxWidth: 90 }],
+            lastMargin: 2,
 
-            waitRoom();
-
-            // ~~~~~~~~~~~~~~~~~~~~~~~loads a waiting room for everyone ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-            function waitRoom() {
-              console.log("I am in the wait room");
-
-              const logo = asset("logo.png");
-              const backing = new Rectangle({
-                width: 900,
-                height: 300,
-                color: "tan",
-                corner: 10,
-                borderWidth: 8,
-                borderColor: "MediumVioletRed ",
-              })
-                .centerReg(content)
-                .loc(null, 320);
-              const welcome = new Label({
-                font: "balloonFont",
-                text: "Welcome to the Balloon POP! Party !",
-                size: 65,
-                color: "MediumVioletRed ",
-              })
-                .centerReg(content)
-                .loc(null, 225);
-
-              const container = new Container(stageW, stageH).center();
-
-              const enter = new Label({
-                font: "balloonFont",
-                text: "Waiting for friends to arrive!",
-                color: white,
-                align: "center",
-              })
-                .centerReg(content)
-                .loc(null, 400);
-
-              const instruction = new Label({
-                font: "balloonFont",
-                text:
-                  "Pop other people's balloons by clicking on them !\n\n You need at least 3 people to throw a party !",
-                color: "rebeccapurple ",
-                valign: "center",
-                align: "center",
-                bold: true,
-              })
-                .centerReg(content)
-                .loc(null, 320);
-
-              const number = new Label({
-                font: "balloonFont",
-                color: white,
-                valign: "center",
-                align: "center",
-              })
-                .centerReg(content)
-                .loc(null, 440);
-              //adds if the socket size is bigger than 3, start the game
-              function setBtn() {
-                if (socketStart.size + 1 >= 3) {
-                  enter.text = "Let's start the party!";
-                  logo
-                    .centerReg(content)
-                    .sca(0.5)
-                    .loc(null, 600)
-                    .animate({
-                      props: { y: 630 },
-                      loop: true,
-                      rewind: true,
-                    });
-                  stage.update();
-                }
-              }
-              //if the socket size is smaller than 3, keep everyone in the waiting room 
-              function leaveBtn() {
-                if (socketStart.size < 3) {
-                  enter.text = "Waiting for friends to arrive!";
-                  stage.update();
-                }
-              }
-              // set the humber of the socket to the people in the room 
-              function setNum() {
-                number.text =
-                  "There are currently " +
-                  (socketStart.size + 1) +
-                  " friends in the room";
-                stage.update();
-              }
-              // when a person leaves the room, minus that number 
-              function minusNumber() {
-                number.text =
-                  "There are currently " +
-                  socketStart.size +
-                  " friends in the room";
-                stage.update();
-              }
-
-              setBtn();
-
-              setNum();
-              // logo appears when enough people are in the room and allows them to enter 
-              logo.on("click", () => {
-                const startElements = [
-                  enter,
-                  instruction,
-                  number,
-                  welcome,
-                  logo,
-                  backing,
-                ];
-
-                for (let i = 0; i < startElements.length; i++) {
-                  startElements[i].animate({
-                    props: { alpha: 0 },
-                    time: 0.5,
-                  });
-                }
-                // if room has 3 people, enter the room. otherwise retry 
-                if (socketStart.size + 1 >= 3) {
-                  startGame();
-                } else {
-                  retry();
-                }
-              });
-
-              socketStart.on("otherjoin", () => {
-                setNum(); // adjust our connections number when someone arrives
-                setBtn(); // adjust our button text when someone arrives
-              });
-
-              socketStart.on("otherleave", () => {
-                minusNumber(); // adjust our numbers when someone arrives
-                leaveBtn(); // adjust our button text when someone arrives
-              });
-            }
-            //show up when there are less than 3 people in the room 
-            function retry() {
-              const retry = new Button({
-                width: 850,
-                height: 100,
-                label: "You need at least 3 friends to start the game!",
-                backgroundColor: red,
-                rollBackgroundColor: grey,
-              })
-                .centerReg(content)
-                .tap(() => {
-                  retry.removeFrom();
-                  waitRoom();
-                });
-            }
-            stage.update();
+            scalingObject: stage,
           });
 
-          // ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~Game Starts after (at least 3 people are in waiting room)~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-
-          function startGame() {
-            const socket = new Socket(
+          frame.on("resize", function () {
+            layout.resize();
+          });
+          new PWA(runZapp);
+          function runZapp() {
+            let socketStart = new Socket(
               zimSocketURL,
               "balloon-pop",
-              "balloon-room"
+              "waiting-room",
+              6
             );
-            socket.on("ready", (data) => {
-              zogg("Game socket is ready");
 
-              // load all the assets including background and balloons
+            socketStart.on("ready", () => {
+              console.log("I'm in socketStart");
 
-              const ball1 = asset("ball1.png");
-              const ball2 = asset("ball2.png");
-              const ball3 = asset("ball3.png");
-              const ball4 = asset("ball4.png");
-              const ball5 = asset("ball5.png");
-              const ball6 = asset("ball6.png");
-              const balloons = [ball1, ball2, ball3, ball4, ball5, ball6];
-              for (let i = 0; i < balloons.length; i++) {
-                balloons[i].sca(0.7);
+              waitRoom();
+
+              // ~~~~~~~~~~~~~~~~~~~~~~~loads a waiting room for everyone ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+              function waitRoom() {
+                console.log("I am in the wait room");
+
+                const logo = asset("logo.png");
+                const backing = new Rectangle({
+                  width: 900,
+                  height: 300,
+                  color: "tan",
+                  corner: 10,
+                  borderWidth: 8,
+                  borderColor: pink,
+                })
+                  .centerReg(content)
+                  .loc(null, 320);
+                const welcome = new Label({
+                  font: "balloonFont",
+                  text: "Welcome to the Balloon POP! Party !",
+                  size: 65,
+                  color: pink,
+                })
+                  .centerReg(content)
+                  .loc(null, 225);
+
+                const container = new Container(stageW, stageH).center();
+
+                const enter = new Label({
+                  font: "balloonFont",
+                  text: "Waiting for friends to arrive!",
+                  color: white,
+                  align: "center",
+                })
+                  .centerReg(content)
+                  .loc(null, 400);
+
+                const instruction = new Label({
+                  font: "balloonFont",
+                  text:
+                    "Pop other people's balloons by clicking on them !\n\n You need at least 3 people to throw a party !",
+                  color: purple,
+                  valign: "center",
+                  align: "center",
+                  bold: true,
+                })
+                  .centerReg(content)
+                  .loc(null, 320);
+
+                const number = new Label({
+                  font: "balloonFont",
+                  color: white,
+                  valign: "center",
+                  align: "center",
+                })
+                  .centerReg(content)
+                  .loc(null, 440);
+                //adds if the socket size is bigger than 3, start the game
+                function setBtn() {
+                  if (socketStart.size + 1 >= 3) {
+                    enter.text = "Let's start the party!";
+                    logo
+                      .centerReg(content)
+                      .sca(0.5)
+                      .loc(null, 600)
+                      .animate({
+                        props: { y: 630 },
+                        loop: true,
+                        rewind: true,
+                      });
+                    stage.update();
+                  }
+                }
+                //if the socket size is smaller than 3, keep everyone in the waiting room
+                function leaveBtn() {
+                  if (socketStart.size < 3) {
+                    enter.text = "Waiting for friends to arrive!";
+                    stage.update();
+                  }
+                }
+                // set the humber of the socket to the people in the room
+                function setNum() {
+                  number.text =
+                    "There are currently " +
+                    (socketStart.size + 1) +
+                    " friends in the room";
+                  stage.update();
+                }
+                // when a person leaves the room, minus that number
+                function minusNumber() {
+                  number.text =
+                    "There are currently " +
+                    socketStart.size +
+                    " friends in the room";
+                  stage.update();
+                }
+
+                setBtn();
+
+                setNum();
+                // logo appears when enough people are in the room and allows them to enter
+                logo.on("click", () => {
+                  const startElements = [
+                    enter,
+                    instruction,
+                    number,
+                    welcome,
+                    logo,
+                    backing,
+                  ];
+
+                  for (let i = 0; i < startElements.length; i++) {
+                    startElements[i].animate({
+                      props: { alpha: 0 },
+                      time: 0.5,
+                    });
+                  }
+                  // if room has 3 people, enter the room. otherwise retry
+                  if (socketStart.size + 1 >= 3) {
+                    startGame();
+                  } else {
+                    retry();
+                  }
+                });
+
+                socketStart.on("otherjoin", () => {
+                  setNum(); // adjust our connections number when someone arrives
+                  setBtn(); // adjust our button text when someone arrives
+                });
+
+                socketStart.on("otherleave", () => {
+                  minusNumber(); // adjust our numbers when someone arrives
+                  leaveBtn(); // adjust our button text when someone arrives
+                });
               }
+              //show up when there are less than 3 people in the room
+              function retry() {
+                const retry = new Button({
+                  width: 850,
+                  height: 100,
+                  label: "You need at least 3 friends to start the game!",
+                  backgroundColor: red,
+                  rollBackgroundColor: grey,
+                })
+                  .centerReg(content)
+                  .tap(() => {
+                    retry.removeFrom();
+                    waitRoom();
+                  });
+              }
+              stage.update();
+            });
 
-              const avatars = {};
-              const removedIDs = [];
+            // ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~Game Starts after (at least 3 people are in waiting room)~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
-              // add existing balloons
-              loop(data, (id, props, count) => {
-                // add balloon
+            function startGame() {
+              const socket = new Socket(
+                zimSocketURL,
+                "balloon-pop",
+                "balloon-room"
+              );
+              socket.on("ready", (data) => {
+                zogg("Game socket is ready");
 
-                avatars[id] = balloons[count].center(); //error on this line "ZIM DispatchEvent() error: data TypeError: Cannot read property 'center' of undefined"
-                addEvent(id);
-              });
+                // load all the assets including background and balloons
 
-              // this function gets called above for existing balloons
-              // and below in the data event for new balloons coming in
-              function addEvent(id) {
-                avatars[id].on("click", () => {
-                  socket.setProperty("removed", id);
+                const ball1 = asset("ball1.png");
+                const ball2 = asset("ball2.png");
+                const ball3 = asset("ball3.png");
+                const ball4 = asset("ball4.png");
+                const ball5 = asset("ball5.png");
+                const ball6 = asset("ball6.png");
+                const balloons = [ball1, ball2, ball3, ball4, ball5, ball6];
+                for (let i = 0; i < balloons.length; i++) {
+                  balloons[i].sca(0.7);
+                }
 
-                  avatars[id].dispose();
+                const avatars = {};
+                const removedIDs = [];
 
-                  removedIDs.push(id);
+                // add existing balloons
+                loop(data, (id, props, count) => {
+                  // add balloon
 
-                  delete avatars[id];
+                  avatars[id] = balloons[count].center(); //error on this line "ZIM DispatchEvent() error: data TypeError: Cannot read property 'center' of undefined"
+                  addEvent(id);
+                });
+
+                // this function gets called above for existing balloons
+                // and below in the data event for new balloons coming in
+                function addEvent(id) {
+                  avatars[id].on("click", () => {
+                    socket.setProperty("removed", id);
+
+                    avatars[id].dispose();
+
+                    removedIDs.push(id);
+
+                    delete avatars[id];
+
+                    stage.update();
+                  });
+                }
+
+                let balloon = balloons[socket.size].addTo();
+
+                // creates the x and y coordinates of the balloon to follow the mouse
+                const dampx = new Damp();
+                const dampy = new Damp();
+                let ticker = Ticker.add(() => {
+                  balloon.x = dampx.convert(frame.mouseX + 50);
+                  balloon.y = dampy.convert(frame.mouseY + 50);
+
+                  socket.setProperties({
+                    x: Math.round(balloon.x),
+                    y: Math.round(balloon.y),
+                  });
+                });
+
+                //set the levels of all the avatars to the same level so you can click them
+                socket.setProperties({
+                  count: socket.size,
+                  level: 1,
+                });
+
+                socket.on("data", (data) => {
+                  // ********************
+                  // no need to loop through data it will always be sent from one socket
+                  // loop through data and remove any sockets that have their socket id=removed
+                  // loop(data, function (i) {
+                  // ********************
+                  // ignore any removed balloon data
+                  // as it may not yet know it is removed
+                  // and would try and add itself back as a new balloon
+                  //*********************
+                  if (removedIDs.indexOf(data.id) >= 0) return;
+
+                  if (data.removed != null && data.removed == socket.id) {
+                    // this balloon is being removed
+
+                    // ********************
+                    // make sure this is not being called twice because the constant sending of Ticker data
+                    // may make values be called more than the one send it seems - we are receiving two calls for removal yet only one removal is being sent
+                    // so if it is the first call the balloon will still be there - then we delete the balloon and set it to null
+                    // so for the second call, there will be no balloon and the second call will be ignored.
+                    // this will prevent the dispose() on undefined error.
+                    // ********************
+                    if (balloon) {
+                      //create a new emitter at the location of the balloon
+                      new zim.Emitter({
+                        obj: {
+                          type: "shape",
+                          s: [
+                            frame.blue,
+                            frame.green,
+                            frame.pink,
+                            frame.yellow,
+                            frame.orange,
+                          ],
+                          ss: 5,
+                        },
+                        random: { color: [blue, green, pink, yellow, orange] },
+                        interval: 1,
+                        life: 2,
+                        decayTime: 0.5,
+                        num: 3,
+                        cache: false,
+                      }).loc(balloon.x, balloon.y);
+
+                      //dispose the balloon on your own screen
+                      balloon.dispose();
+                      balloon = null; // remove reference to balloon
+
+                      for (let id in avatars) {
+                        avatars[id].noMouse();
+                      }
+
+                      // loop(data, (id) => {
+                      //   // add avatar
+                      //   console.log("hallo");
+                      //   console.log(id);
+                      //   //   avatars[id].noMouse();
+                      // });
+                      //console.log(data.id);
+
+                      //play fireworks sound
+                      const fireworks = asset("fireworks.wav").play();
+
+                      Ticker.remove(ticker);
+
+                      //show lose pane on your own screen
+                      timeout(1, function () {
+                        new Pane(
+                          500,
+                          100,
+                          "Your balloon got POPPED!",
+                          red,
+                          white
+                        )
+                          .noMouse()
+                          .show()
+                          .centerReg(content);
+                      });
+                    }
+                  } else if (data.removed != null) {
+                    // another person's balloon is being removed
+
+                    // remove all the balloons on OTHER people's screen and remove the reference to the balloon
+
+                    // ********************
+                    // do not remove an id that has already been removed
+                    if (removedIDs.indexOf(data.removed) == -1) {
+                      // has not already been removed
+                      removedIDs.push(data.removed);
+                      avatars[data.removed].dispose();
+                      delete avatars[data.removed];
+                    }
+                  }
+                  // });
+
+                  //continously update that x and y location of your balloon for OTHER people
+                  if (avatars[data.id]) {
+                    if (data.x != null) avatars[data.id].x = data.x;
+                    if (data.y != null) avatars[data.id].y = data.y;
+                    if (data.level != null) avatars[data.id].level = 1;
+                    // avatars[data.id].on("click", ()=>{
+                    //     // set the removed property on the clicked balloon
+                    //     socket.setProperty("removed", data.id);
+
+                    //     // dispose of the balloon
+                    //     avatars[data.id].dispose();
+
+                    //      // removes and clears from memory
+                    //     delete avatars[data.id];
+                    //     stage.update();
+                    // })
+                  } else {
+                    // we are new and we want to add avatar
+                    // add avatar
+                    avatars[data.id] = balloons[data.count].center();
+                    addEvent(data.id);
+                  }
 
                   stage.update();
                 });
-              }
 
-              let balloon = balloons[socket.size].addTo();
-
-              // creates the x and y coordinates of the balloon to follow the mouse
-              const dampx = new Damp();
-              const dampy = new Damp();
-              let ticker = Ticker.add(() => {
-                balloon.x = dampx.convert(frame.mouseX + 50);
-                balloon.y = dampy.convert(frame.mouseY + 50);
-
-                socket.setProperties({
-                  x: Math.round(balloon.x),
-                  y: Math.round(balloon.y),
+                // if a person leaves
+                socket.on("otherleave", (data) => {
+                  avatars[data.id].dispose(); // removes and clears from memory
+                  delete avatars[data.id]; // js to delete property from object
+                  stage.update();
                 });
-              });
-
-              //set the levels of all the avatars to the same level so you can click them
-              socket.setProperties({
-                count: socket.size,
-                level: 1,
-              });
-
-              socket.on("data", (data) => {
-                // ********************
-                // no need to loop through data it will always be sent from one socket
-                // loop through data and remove any sockets that have their socket id=removed
-                // loop(data, function (i) {
-                // ********************
-                // ignore any removed balloon data
-                // as it may not yet know it is removed
-                // and would try and add itself back as a new balloon
-                //*********************
-                if (removedIDs.indexOf(data.id) >= 0) return;
-
-                if (data.removed != null && data.removed == socket.id) {
-                  // this balloon is being removed
-
-                  // ********************
-                  // make sure this is not being called twice because the constant sending of Ticker data
-                  // may make values be called more than the one send it seems - we are receiving two calls for removal yet only one removal is being sent
-                  // so if it is the first call the balloon will still be there - then we delete the balloon and set it to null
-                  // so for the second call, there will be no balloon and the second call will be ignored.
-                  // this will prevent the dispose() on undefined error.
-                  // ********************
-                  if (balloon) {
-                    //create a new emitter at the location of the balloon
-                    new zim.Emitter({
-                      obj: {
-                        type: "shape",
-                        s: [
-                          frame.blue,
-                          frame.green,
-                          frame.pink,
-                          frame.yellow,
-                          frame.orange,
-                        ],
-                        ss: 5,
-                      },
-                      random: { color: [blue, green, pink, yellow, orange] },
-                      interval: 1,
-                      life: 2,
-                      decayTime: 0.5,
-                      num: 3,
-                      cache: false,
-                    }).loc(balloon.x, balloon.y);
-
-                    //dispose the balloon on your own screen
-                    balloon.dispose();
-                    balloon = null; // remove reference to balloon
-
-                    for (let id in avatars) {
-                      avatars[id].noMouse();
-                    }
-
-                    // loop(data, (id) => {
-                    //   // add avatar
-                    //   console.log("hallo");
-                    //   console.log(id);
-                    //   //   avatars[id].noMouse();
-                    // });
-                    //console.log(data.id);
-
-                    //play fireworks sound
-                    // const fireworks=asset("fireworks.wav").play()
-
-                    Ticker.remove(ticker);
-
-                    //show lose pane on your own screen
-                    timeout(1, function () {
-                      new Pane(500, 100, "Your balloon got POPPED!", red, white)
-                        .noMouse()
-                        .show();
-                    });
-                  }
-                } else if (data.removed != null) {
-                  // another person's balloon is being removed
-
-                  // remove all the balloons on OTHER people's screen and remove the reference to the balloon
-
-                  // ********************
-                  // do not remove an id that has already been removed
-                  if (removedIDs.indexOf(data.removed) == -1) {
-                    // has not already been removed
-                    removedIDs.push(data.removed);
-                    avatars[data.removed].dispose();
-                    delete avatars[data.removed];
-                  }
-                }
-                // });
-
-                //continously update that x and y location of your balloon for OTHER people
-                if (avatars[data.id]) {
-                  if (data.x != null) avatars[data.id].x = data.x;
-                  if (data.y != null) avatars[data.id].y = data.y;
-                  if (data.level != null) avatars[data.id].level = 1;
-                  // avatars[data.id].on("click", ()=>{
-                  //     // set the removed property on the clicked balloon
-                  //     socket.setProperty("removed", data.id);
-
-                  //     // dispose of the balloon
-                  //     avatars[data.id].dispose();
-
-                  //      // removes and clears from memory
-                  //     delete avatars[data.id];
-                  //     stage.update();
-                  // })
-                } else {
-                  // we are new and we want to add avatar
-                  // add avatar
-                  avatars[data.id] = balloons[data.count].center();
-                  addEvent(data.id);
-                }
 
                 stage.update();
               });
+            }
 
-              // if a person leaves
-              socket.on("otherleave", (data) => {
-                avatars[data.id].dispose(); // removes and clears from memory
-                delete avatars[data.id]; // js to delete property from object
-                stage.update();
-              });
-
-              stage.update();
-            });
-          }
-
-          stage.update();
+            stage.update();
+          } // end runZapp
         } // end runZapp
       }); // end of ready
     </script>
